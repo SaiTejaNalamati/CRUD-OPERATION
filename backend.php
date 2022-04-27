@@ -75,9 +75,10 @@ if(isset($_POST['dparam'])){
         echo "Failed";
     }
 }
-if(isset($_POST["order"]) || isset($_POST["column_name"])){
+if(isset($_POST["order"]) || isset($_POST["column_name"]) || isset($_POST["limits"])){
 $output="";
-$order = $_POST["order"];
+$limit=$_POST["limits"];
+@$order = $_POST["order"];
 $col = $_POST['column_name'];
 if($order == 'desc'){
     $order = 'asc';
@@ -86,14 +87,14 @@ else{
     $order = 'desc';
 }
 
-$query = "select * from studentss order by $col $order";
+$query = "select * from studentss order by $col $order limit $limit";
 $result = mysqli_query($con,$query);
 $output.='<div class="card-body" id="mytables">
 <table class="table" id="mytable">
     <thead class="table-dark">
         <tr>
             <th><a class="column_sort" id="fname" data-order="'.$order.'" href="#">First Name</a></th>
-            <th><a class="column_sort" id="lname" data-order="'.$order.'" href="#">Last Name</th>
+            <th>Last Name</th>
             <th>Department</th>
             <th>Email</th>
             <th>Status</th>
@@ -112,7 +113,7 @@ while($row = mysqli_fetch_array($result)){
             <td>'.$row['Status'].'</td>
             <td>
                 <a class ="btn btn-info" onclick="views('.$row['id'].')">View</a>
-                <a class="btn btn-warning" onclick="edits('.$row['id'].','.$row['fname'].','.$row['lname'].','.$row['dept'].','.$row['email'].')">Edit</a>
+                <a class="btn btn-warning" onclick="edits('.$row['id'].')">Edit</a>
                 <a class ="btn btn-danger" onclick="deletes('.$row['id'].')">Delete</a>
                 
             </td>
@@ -121,5 +122,46 @@ while($row = mysqli_fetch_array($result)){
 }
 $output.='</tbody></table></div>';
 echo $output;
+}
+if(isset($_POST["pa"]) || isset($_POST["column_names"]) || isset($_POST["orders"]) ){
+    $output="";
+    $limit=$_POST["pa"];
+    $order = $_POST["orders"];
+    $col = $_POST['column_names'];
+    $query = "select * from studentss order by $col $order  limit $limit";
+    $result = mysqli_query($con,$query);
+    $output.='<div class="card-body" id="mytables">
+    <table class="table" id="mytable">
+        <thead class="table-dark">
+            <tr>
+                <th><a class="column_sort" id="fname"  href="#">First Name</a></th>
+                <th>Last Name</th>
+                <th>Department</th>
+                <th>Email</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+    ';
+    while($row = mysqli_fetch_array($result)){
+        $output.='
+        <tbody>
+            <tr>
+                <td>'.$row['fname'].'</td>
+                <td>'.$row['lname'].'</td>
+                <td>'.$row['dept'].'</td>
+                <td>'.$row['email'].'</td>
+                <td>'.$row['Status'].'</td>
+                <td>
+                    <a class ="btn btn-info" onclick="views('.$row['id'].')">View</a>
+                    <a class="btn btn-warning" onclick="edits('.$row['id'].')">Edit</a>
+                    <a class ="btn btn-danger" onclick="deletes('.$row['id'].')">Delete</a>
+                    
+                </td>
+            </tr>    
+        ';
+    }
+    $output.='</tbody></table></div>';
+    echo $output;
 }
 ?>

@@ -1,5 +1,5 @@
 <?php
-    include "config.php";
+    include "config.php"
 ?>
 <!doctype html>
 <html lang="en">
@@ -129,7 +129,7 @@
                         <form method="post" action="index.php">
                         <div class="form-group row">
                         <div class="col-md-3">
-                            <select id="leaves"  name="leaves" onchange="leaveChange()" class="form-control">
+                            <select id="leaves"  name="leaves"  class="form-control">
                             <option value="All">All</option>
                             <option value="Active">Active</option>
                             <option value="InActive">InActive</option>
@@ -138,9 +138,17 @@
                         <div class="col-md-3">
                          <button type="submit" class="btn btn-primary">GET</button>
                          </div>
+                         <div class="col-md-1" style="margin-left:426px;margin-top:5px;">
+                            <select id="pag"  name="pag" onchange="leaveChange()" class="form-control">
+                            <option value="3">3</option>
+                            <option value="5">5</option>
+                            <option value="10">10</option>
+                            </select>
+                        </div>
                          </div>
                         </form>
                     </div>
+                    <input type="hidden" id="lim" name="lim">
                     <form action="" method="POST">
                     <div class="card-body" id="mytables">
                         
@@ -148,7 +156,7 @@
                             <thead class="table-dark">
                                 <tr>
                                 <th><a class="column_sort" id="fname" data-order="desc" href="#">First Name</a></th>
-                                <th><a class="column_sort" id="lname" data-order="desc" href="#">Last Name</a></th>
+                                <th>Last Name</th>
                                 <th>Department</th>
                                 <th>Email</th>
                                 <th>Status</th>
@@ -157,7 +165,7 @@
                             </thead>
                             <tbody>
                             <?php
-                                $limit = 4 ;
+                                $limit=3;
                                 $page = isset($_GET['page']) ? $_GET['page'] : 1;
                                 $start = ($page - 1) * $limit;
                                 $sql1="select * from studentss ORDER By fname desc limit $start,$limit";
@@ -190,8 +198,7 @@
                                                     <a class="btn btn-warning" onclick="edits('<?php echo $row['id'];?>','<?php echo $row['fname'];?>','<?php echo $row['lname'];?>','<?php echo $row['dept'];?>','<?php echo $row['email'];?>')">Edit</a>
                                                     <a class ="btn btn-danger" onclick="deletes('<?php echo $row['id'];?>')">Delete</a>
                                                 </td>
-                                            </tr> 
-                                                                                        
+                                            </tr>                       
                                             <?php
                                         }
                                     }
@@ -256,6 +263,7 @@
              $excount = $result2->fetch_all(MYSQLI_ASSOC);
              $total = $excount[0]['id'];
              $pages = ceil( $total / $limit );
+             
         ?>
         <nav aria-label="Page navigation example">
 					<ul class="pagination">
@@ -337,12 +345,10 @@
                     success:function(data)
                     {
                         
-                        
                             setTimeout(function(){
                                 window.location.replace("index.php");
                             })
                          
-                       
                     }
                 });
             }
@@ -405,9 +411,8 @@
                     {
                         setTimeout(function(){
                                 window.location.replace("index.php");
-                            })
-                         
-                    }
+                        })
+                   }
                 });
         });
     }
@@ -429,22 +434,20 @@
             });
     }
 </script>
+<input type="hidden" id="limits" value="<?php echo $limit;?>">
 <script>
     $(document).ready(function () {
         $(document).on('click','.column_sort',function(){
             var column_name = $(this).attr("id");
             var order = $(this).data("order");
-            var arrow ='';
-            if(order == 'desc'){
-                arrow= '&nbsp;<span class="glyphicon glyphicon-arrow-down" ></span>';
-            }
-            else{
-                arrow= '&nbsp;<span class="glyphicon glyphicon-arrow-up" ></span>';
-            }
+            var id=document.getElementById("pag").value;
+            document.getElementById("lim").value=id;
+            var res = document.getElementById("lim").value;
+            var arrow ='';    
             $.ajax({
                 url: "backend.php",
                 method:"POST",
-                data: {column_name:column_name,order:order},
+                data: {column_name:column_name,order:order,"limits":res},
                 success: function (data) {
                     $('#mytables').html(data);
                     $('#'+column_name+'').append(arrow);
@@ -453,6 +456,29 @@
         });
     });
 </script>
-
+<script>
+    function leaveChange()
+    {
+        var id=document.getElementById("pag").value;
+        document.getElementById("lim").value=id;
+        var res = document.getElementById("lim").value;
+        var column_name = "fname";
+        var order="desc";
+        $.ajax({
+            url:"backend.php",
+            method:"post",
+            async:false,
+            data:{
+                "pa":res,
+                "column_names":column_name,
+                "orders":order
+            },
+            success:function(data)
+            {
+                $("#mytables").html(data)
+            }
+        });
+    }
+</script>
 </body>
 </html>
